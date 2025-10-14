@@ -24,7 +24,7 @@ import { UserDto } from './dto/user.dto';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly users: UsersService) {}
+  constructor(private users: UsersService) {}
 
   @Get()
   getTest() {
