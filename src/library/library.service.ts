@@ -19,8 +19,9 @@ export class LibraryService {
   ) {}
 
   async add(dto: CreateLibraryItemDto) {
+    console.log('dto in add', dto);
     try {
-      const doc = await this.model.create({ dto });
+      const doc = await this.model.create(dto);
       return doc;
     } catch (e: any) {
       if (e?.code === 11000) {

@@ -18,6 +18,7 @@ export class LibraryController {
 
   @Post()
   async add(@Req() req: any, @Body() dto: CreateLibraryItemDto) {
+    console.log('add2');
     // const userId = new Types.ObjectId(req.user.id);
     return this.service.add(dto);
   }
