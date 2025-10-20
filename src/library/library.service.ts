@@ -1,10 +1,6 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import {
   LibraryItem,
   LibraryItemDocument,
@@ -30,7 +26,7 @@ export class LibraryService {
           address: dto.address,
           kind: dto.kind,
           provider: dto.provider,
-          externalId: dto.externalId,
+          song: dto.song,
         });
         return existing;
       }
@@ -42,13 +38,13 @@ export class LibraryService {
     address: string,
     kind: string,
     provider: string,
-    externalId: string,
+    audioId: string,
   ) {
     const res = await this.model.findOneAndDelete({
       address,
       kind,
       provider,
-      externalId,
+      audioId,
     });
     if (!res) throw new NotFoundException('Item not found');
     return { ok: true };
@@ -78,7 +74,7 @@ export class LibraryService {
       .select({ externalId: 1 })
       .lean();
 
-    const set = new Set(rows.map((r) => r.externalId));
+    const set = new Set(rows.map((r) => r.song?.audioId));
     const map: Record<string, boolean> = {};
     ids.forEach((id) => {
       map[id] = set.has(id);

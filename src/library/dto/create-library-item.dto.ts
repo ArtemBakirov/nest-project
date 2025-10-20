@@ -1,4 +1,5 @@
-import { IsEnum, IsString, IsOptional, IsObject } from 'class-validator';
+import { IsEnum, IsString, IsObject } from 'class-validator';
+import type { Song } from '../library.types';
 
 export class CreateLibraryItemDto {
   @IsString()
@@ -10,15 +11,6 @@ export class CreateLibraryItemDto {
   @IsEnum(['youtube', 'jamendo'])
   provider: 'youtube' | 'jamendo';
 
-  @IsString()
-  externalId: string;
-
-  @IsOptional()
   @IsObject()
-  snapshot?: {
-    title: string;
-    subtitle?: string;
-    thumbnail: string;
-    extra?: Record<string, any>;
-  };
+  song: Song;
 }

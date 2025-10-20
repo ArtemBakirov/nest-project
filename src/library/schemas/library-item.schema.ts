@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
+import type { Song } from '../library.types';
 
 export type LibraryItemDocument = HydratedDocument<LibraryItem>;
 
@@ -14,28 +15,19 @@ export class LibraryItem {
   @Prop({ enum: ['youtube', 'jamendo'], index: true, required: true })
   provider: 'youtube' | 'jamendo';
 
-  // videoId / playlistId / channelId (or jamendo ids)
-  @Prop({ type: String, index: true, required: true })
-  externalId: string;
-
   // avoid duplicates per user+kind+provider+externalId
   @Prop({ type: String, unique: false }) // uniqueness enforced by compound index below
   _dedupe?: string;
 
   @Prop({
     type: {
-      title: String,
-      subtitle: String,
+      channelTitle: String,
+      audioId: String,
       thumbnail: String,
-      extra: Object,
+      title: String,
     },
   })
-  snapshot?: {
-    title: string;
-    subtitle?: string;
-    thumbnail: string;
-    extra?: Record<string, any>;
-  };
+  song?: Song;
 }
 
 export const LibraryItemSchema = SchemaFactory.createForClass(LibraryItem);

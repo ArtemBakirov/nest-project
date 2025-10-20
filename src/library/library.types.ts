@@ -1,3 +1,10 @@
+export type Song = {
+  channelTitle: string;
+  audioId: string;
+  thumbnail: string;
+  title: string;
+};
+
 export type Provider = 'youtube' | 'jamendo';
 
 export type LibraryKind = 'track' | 'album' | 'artist';

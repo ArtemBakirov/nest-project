@@ -8,7 +8,6 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
-import { Types } from 'mongoose';
 import { LibraryService } from './library.service';
 import { CreateLibraryItemDto } from './dto/create-library-item.dto';
 
@@ -28,7 +27,7 @@ export class LibraryController {
     @Req() req: any,
     @Query('kind') kind: 'track' | 'album' | 'artist',
     @Query('provider') provider: 'youtube' | 'jamendo',
-    @Query('externalId') externalId: string,
+    @Query('audioId') externalId: string,
     @Query('address') address: string,
   ) {
     // const userId = new Types.ObjectId(req.user.id);
