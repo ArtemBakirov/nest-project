@@ -15,7 +15,6 @@ export class LibraryItem {
   @Prop({ enum: ['youtube', 'jamendo'], index: true, required: true })
   provider: 'youtube' | 'jamendo';
 
-  // avoid duplicates per user+kind+provider+externalId
   @Prop({ type: String, unique: false }) // uniqueness enforced by compound index below
   _dedupe?: string;
 
@@ -28,12 +27,40 @@ export class LibraryItem {
     },
   })
   song?: Song;
+
+  @Prop({ type: String })
+  channelId?: string;
+
+  @Prop({ type: String })
+  playlistId?: string;
 }
 
 export const LibraryItemSchema = SchemaFactory.createForClass(LibraryItem);
 
 // Compound unique index to prevent duplicates
+// (existing)
 LibraryItemSchema.index(
-  { userId: 1, kind: 1, provider: 1, externalId: 1 },
-  { unique: true },
+  { address: 1, kind: 1, provider: 1, 'song.audioId': 1 },
+  {
+    unique: true,
+    partialFilterExpression: { 'song.audioId': { $type: 'string' } },
+  },
+);
+
+// NEW — albums
+LibraryItemSchema.index(
+  { address: 1, kind: 1, provider: 1, playlistId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { playlistId: { $type: 'string' } },
+  },
+);
+
+// NEW — artists
+LibraryItemSchema.index(
+  { address: 1, kind: 1, provider: 1, channelId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { channelId: { $type: 'string' } },
+  },
 );

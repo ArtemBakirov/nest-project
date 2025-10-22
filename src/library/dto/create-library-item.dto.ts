@@ -1,4 +1,10 @@
-import { IsEnum, IsString, IsObject } from 'class-validator';
+import {
+  IsEnum,
+  IsString,
+  IsObject,
+  IsOptional,
+  ValidateIf,
+} from 'class-validator';
 import type { Song } from '../library.types';
 
 export class CreateLibraryItemDto {
@@ -11,6 +17,21 @@ export class CreateLibraryItemDto {
   @IsEnum(['youtube', 'jamendo'])
   provider: 'youtube' | 'jamendo';
 
+  // Track
+  @ValidateIf((o) => o.kind === 'track')
   @IsObject()
-  song: Song;
+  song?: Song;
+
+  // Album
+  @ValidateIf((o) => o.kind === 'album')
+  @IsString()
+  playlistId?: string;
+
+  // Artist
+  @ValidateIf((o) => o.kind === 'artist')
+  @IsString()
+  channelId?: string;
+
+  @IsOptional()
+  _dedupe?: string;
 }
