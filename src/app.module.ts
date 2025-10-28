@@ -7,6 +7,7 @@ import { StorageModule } from './storage/storage.module';
 import { SongsModule } from './songs/songs.module';
 import { UsersModule } from './users/users.module';
 import { LibraryModule } from './library/library.module';
+import { YoutubeCacheModule } from './youtube-cache/youtube-cache.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { LibraryModule } from './library/library.module';
     SongsModule,
     UsersModule,
     LibraryModule,
+    YoutubeCacheModule,
   ],
   controllers: [AppController],
   providers: [AppService],
