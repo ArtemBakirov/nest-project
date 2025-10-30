@@ -29,6 +29,7 @@ export class LibraryService {
   ) {}
 
   async add(dto: CreateLibraryItemDto) {
+    console.log('adding dto', dto);
     const filter: any = {
       address: dto.address,
       provider: dto.provider,
@@ -37,20 +38,23 @@ export class LibraryService {
     if (dto.kind === 'track') filter.videoId = dto.videoId;
     if (dto.kind === 'album') filter.playlistId = dto.playlistId;
     if (dto.kind === 'artist') filter.channelId = dto.channelId;
-
+    console.log('add to library filter', filter);
     const doc = await this.lib.findOneAndUpdate(
       filter,
       { $setOnInsert: { snapshot: dto.snapshot ?? null } },
       { upsert: true, new: true },
     );
+    console.log('added doc ', doc);
     return doc;
   }
 
-  async remove(address: string, provider: string, kind: string, id: string) {
+  async remove(address: string, kind: string, provider: string, id: string) {
+    console.log('id', id);
     const filter: any = { address, provider, kind };
     if (kind === 'track') filter.videoId = id;
     if (kind === 'album') filter.playlistId = id;
     if (kind === 'artist') filter.channelId = id;
+    console.log('removing with filter', filter);
 
     const res = await this.lib.findOneAndDelete(filter);
     if (!res) throw new NotFoundException('Item not found');

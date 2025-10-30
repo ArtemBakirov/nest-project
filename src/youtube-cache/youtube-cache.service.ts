@@ -423,6 +423,7 @@ export class YoutubeCacheService {
     url.searchParams.set('key', key);
 
     const json = await this.fetchJSON(url.toString());
+    console.log('getting meta json', json);
     const p = json.items?.[0];
     if (!p) throw new Error('Playlist not found');
 

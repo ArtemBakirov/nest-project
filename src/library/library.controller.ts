@@ -27,9 +27,10 @@ export class LibraryController {
     @Req() req: any,
     @Query('kind') kind: 'track' | 'album' | 'artist',
     @Query('provider') provider: 'youtube' | 'jamendo',
-    @Query('audioId') externalId: string,
+    @Query('id') externalId: string,
     @Query('address') address: string,
   ) {
+    console.log('removing');
     // const userId = new Types.ObjectId(req.user.id);
     return this.service.remove(address, kind, provider, externalId);
   }
