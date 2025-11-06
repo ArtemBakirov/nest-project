@@ -423,7 +423,6 @@ export class YoutubeCacheService {
     url.searchParams.set('key', key);
 
     const json = await this.fetchJSON(url.toString());
-    console.log('getting meta json', json);
     const p = json.items?.[0];
     if (!p) throw new Error('Playlist not found');
 
@@ -474,7 +473,7 @@ export class YoutubeCacheService {
 
       const hasMore = rows.length > max;
       const slice = hasMore ? rows.slice(0, max) : rows;
-      console.log('slice', slice);
+
       return {
         items: slice.map((r) => ({
           videoId: r.videoId,
@@ -497,7 +496,6 @@ export class YoutubeCacheService {
     url.searchParams.set('key', key);
 
     const json = await this.fetchJSON(url.toString());
-    console.log('playlist items json', json.items);
 
     const items = (json.items ?? [])
       .map((it: any) => {
@@ -515,7 +513,6 @@ export class YoutubeCacheService {
         };
       })
       .filter(Boolean);
-    console.log('playlist items items', items);
 
     // upsert items into cache for next time
     if (items.length) {
@@ -538,6 +535,25 @@ export class YoutubeCacheService {
         { ordered: false },
       );
     }
+
+    // ✅ Also seed videos in yt_videos (new addition)
+    await this.vids.bulkWrite(
+      items.map((v) => ({
+        updateOne: {
+          filter: { videoId: v.videoId },
+          update: {
+            $setOnInsert: {
+              title: v.title,
+              channelTitle: v.channelTitle,
+              thumbnails: { default: v.thumbnail },
+              lastFetchedAt: new Date(),
+            },
+          },
+          upsert: true,
+        },
+      })),
+      { ordered: false },
+    );
 
     return { items, nextPageToken: json.nextPageToken };
   }
