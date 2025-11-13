@@ -15,7 +15,7 @@ import { YoutubeCacheModule } from './youtube-cache/youtube-cache.module';
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => ({
-        uri: cfg.get<string>('MONGODB_CONNECTION_STRING')!,
+        uri: cfg.get<string>('MONGODB_CONNECTION_STRING_DEV')!,
         dbName: 'quotesApp', // optional, included in URI
       }),
     }),

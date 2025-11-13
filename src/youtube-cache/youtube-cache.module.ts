@@ -22,7 +22,15 @@ import {
 
 @Module({
   imports: [
-    HttpModule,
+    HttpModule.registerAsync({
+      useFactory: () => ({
+        baseURL: 'https://www.googleapis.com/youtube/v3',
+        params: {
+          key: process.env.YT_API_KEY, // default param for every request
+        },
+        timeout: 5000,
+      }),
+    }),
     MongooseModule.forFeature([
       { name: YtVideo.name, schema: YtVideoSchema },
       { name: YtPlaylist.name, schema: YtPlaylistSchema },

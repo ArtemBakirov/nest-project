@@ -53,6 +53,7 @@ export class YoutubeCacheService {
     max = 24,
     pageToken?: string,
   ) {
+    console.log('search paged');
     const cached = await this.searchPages
       .findOne({
         kind: 'video',
@@ -92,17 +93,18 @@ export class YoutubeCacheService {
       return { items, nextPageToken: cached.nextPageToken };
     }
 
-    // 2) miss -> call YT and seed
-    const url = new URL(`${API_BASE}/search`);
-    url.searchParams.set('part', 'snippet');
-    if (q) url.searchParams.set('q', q);
-    if (channelId) url.searchParams.set('channelId', channelId);
-    url.searchParams.set('type', 'video');
-    url.searchParams.set('maxResults', String(max));
-    if (pageToken) url.searchParams.set('pageToken', pageToken);
-    url.searchParams.set('key', key);
+    const params = {
+      part: 'snippet',
+      q,
+      channelId,
+      type: 'video',
+      maxResults: max,
+      pageToken,
+    };
 
-    const json = await this.fetchJSON(url.toString());
+    const response = await this.http.axiosRef.get('/search', { params });
+    const json = response.data;
+
     const ids: string[] = [];
     const items = (json.items ?? [])
       .map((it: any) => {
@@ -205,16 +207,17 @@ export class YoutubeCacheService {
     }
 
     // miss -> YT
-    const url = new URL(`${API_BASE}/search`);
-    url.searchParams.set('part', 'snippet');
-    if (q) url.searchParams.set('q', q);
-    if (channelId) url.searchParams.set('channelId', channelId);
-    url.searchParams.set('type', 'playlist');
-    url.searchParams.set('maxResults', String(max));
-    if (pageToken) url.searchParams.set('pageToken', pageToken);
-    url.searchParams.set('key', key);
+    const params = {
+      part: 'snippet',
+      q,
+      channelId,
+      type: 'playlist',
+      maxResults: max,
+      pageToken,
+    };
 
-    const json = await this.fetchJSON(url.toString());
+    const response = await this.http.axiosRef.get('/search', { params });
+    const json = response.data;
     const ids: string[] = [];
     const items = (json.items ?? [])
       .map((it: any) => {
@@ -307,16 +310,17 @@ export class YoutubeCacheService {
       return { items, nextPageToken: cached.nextPageToken };
     }
 
-    // miss -> YT
-    const url = new URL(`${API_BASE}/search`);
-    url.searchParams.set('part', 'snippet');
-    url.searchParams.set('q', q);
-    url.searchParams.set('type', 'channel');
-    url.searchParams.set('maxResults', String(max));
-    if (pageToken) url.searchParams.set('pageToken', pageToken);
-    url.searchParams.set('key', key);
+    const params = {
+      part: 'snippet',
+      q,
+      type: 'channel',
+      maxResults: max,
+      pageToken,
+    };
 
-    const json = await this.fetchJSON(url.toString());
+    const response = await this.http.axiosRef.get('/search', { params });
+    const json = response.data;
+
     const ids: string[] = [];
     const items = (json.items ?? [])
       .map((it: any) => {
@@ -380,12 +384,14 @@ export class YoutubeCacheService {
     const cached = await this.chs.findOne({ channelId }).lean();
     if (cached && !this.isStale(cached.lastFetchedAt)) return cached;
 
-    const url = new URL(`${API_BASE}/channels`);
-    url.searchParams.set('part', 'snippet,brandingSettings');
-    url.searchParams.set('id', channelId);
-    url.searchParams.set('key', key);
+    const params = {
+      part: 'snippet,brandingSettings',
+      id: channelId,
+    };
 
-    const json = await this.fetchJSON(url.toString());
+    const response = await this.http.axiosRef.get('/channels', { params });
+    const json = response.data;
+
     const item = json.items?.[0];
     if (!item) throw new Error('Channel not found');
 
@@ -417,12 +423,15 @@ export class YoutubeCacheService {
     const cached = await this.pls.findOne({ playlistId }).lean();
     if (cached && !this.isStale(cached.lastFetchedAt)) return cached;
 
-    const url = new URL(`${API_BASE}/playlists`);
-    url.searchParams.set('part', 'snippet,contentDetails');
-    url.searchParams.set('id', playlistId);
-    url.searchParams.set('key', key);
+    const params = {
+      part: 'snippet,contentDetails',
+      id: playlistId,
+    };
 
-    const json = await this.fetchJSON(url.toString());
+    const response = await this.http.axiosRef.get('/playlists', { params });
+    const json = response.data;
+    console.log('');
+
     const p = json.items?.[0];
     if (!p) throw new Error('Playlist not found');
 
@@ -487,15 +496,15 @@ export class YoutubeCacheService {
       };
     }
 
-    // Fallback to YouTube (or when client provides pageToken we don't know)
-    const url = new URL(`${API_BASE}/playlistItems`);
-    url.searchParams.set('part', 'snippet');
-    url.searchParams.set('playlistId', playlistId);
-    url.searchParams.set('maxResults', String(max));
-    if (pageToken) url.searchParams.set('pageToken', pageToken);
-    url.searchParams.set('key', key);
+    const params = {
+      part: 'snippet',
+      playlistId,
+      maxResults: max,
+      pageToken,
+    };
 
-    const json = await this.fetchJSON(url.toString());
+    const response = await this.http.axiosRef.get('/playlistItems', { params });
+    const json = response.data;
 
     const items = (json.items ?? [])
       .map((it: any) => {
